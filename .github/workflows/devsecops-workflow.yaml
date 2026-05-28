@@ -85,35 +85,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Start Node.js application
+      - name: Start OWASP Juice Shop vulnerable web app
         run: |
-          nohup npm start > app.log 2>&1 &
-          sleep 5
-          cat app.log
+          docker run -d -p 3000:3000 --name juice-shop bkimminich/juice-shop
+          sleep 30
 
-      - name: Wait for application to be ready
+      - name: Check Juice Shop is running
         run: |
-          for i in {1..12}; do
-            if curl -I http://localhost:3000; then
-              echo "Application is running"
-              exit 0
-            fi
-
-            echo "Waiting for application to start..."
-            sleep 5
-          done
-
-          echo "Application failed to start"
-          cat app.log
-          exit 1
+          curl -I --max-time 30 http://localhost:3000
 
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
