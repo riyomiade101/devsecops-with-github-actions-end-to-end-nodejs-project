@@ -22,22 +22,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 21
+          node-version: 20
           cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Run unit tests
-        run: npm test
+        run: npm test --if-present
         continue-on-error: true
 
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
+      - name: SonarQube Cloud Scan
+        uses: sonarsource/sonarqube-scan-action@v4.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -45,6 +47,8 @@ jobs:
           args: >
             -Dsonar.organization=riyomiade101
             -Dsonar.projectKey=riyomiade101_devsecops-with-github-actions-end-to-end-nodejs-project
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
 
   security:
     runs-on: ubuntu-latest
@@ -54,6 +58,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -76,7 +86,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 21
+          node-version: 20
           cache: npm
 
       - name: Install dependencies
