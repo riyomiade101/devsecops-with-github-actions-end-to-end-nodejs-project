@@ -44,7 +44,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=riyomiade101
-            -Dsonar.projectKey=riyomiade101_devsecops-with-github-actions-end-to-end-nodejs-project2
+            -Dsonar.projectKey=riyomiade101_devsecops-with-github-actions-end-to-end-nodejs-project
 
   security:
     runs-on: ubuntu-latest
