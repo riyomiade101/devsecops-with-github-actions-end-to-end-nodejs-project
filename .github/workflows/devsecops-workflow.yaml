@@ -47,6 +47,7 @@ jobs:
             -Dsonar.organization=riyomiade101
             -Dsonar.projectKey=riyomiade101_devsecops-with-github-actions-end-to-end-nodejs-project
             -Dsonar.sources=.
+            -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,build/**
             -Dsonar.host.url=https://sonarcloud.io
 
   security:
@@ -94,12 +95,25 @@ jobs:
 
       - name: Start Node.js application
         run: |
-          npm start &
-          sleep 30
+          nohup npm start > app.log 2>&1 &
+          sleep 5
+          cat app.log
 
-      - name: Check application is running
+      - name: Wait for application to be ready
         run: |
-          curl -I --max-time 30 http://localhost:3000
+          for i in {1..12}; do
+            if curl -I http://localhost:3000; then
+              echo "Application is running"
+              exit 0
+            fi
+
+            echo "Waiting for application to start..."
+            sleep 5
+          done
+
+          echo "Application failed to start"
+          cat app.log
+          exit 1
 
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
